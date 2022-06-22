@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.tpe.domain.Student;
+import com.tpe.dto.StudentDTO;
 import com.tpe.exception.ConflictException;
 import com.tpe.exception.ResourceNotFoundException;
 import com.tpe.repository.StudentRepository;
@@ -53,9 +56,25 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public void updateStudent(Student student) {
+	public void updateStudent(Long id, StudentDTO studentDTO) {
 		// studentRepository.update(student);
+		Boolean emailExist = studentRepository.existsByEmail(studentDTO.getEmail());
+		Student student = findStudent(id);
+		
+		if(emailExist && studentDTO.getEmail().equals(student.getEmail())) {
+			throw new ConflictException("Email already exist");
+		}
+		
+		// Student updateStudent = new Student();
 
+		student.setFirstName(studentDTO.getFirstName());
+		student.setLastName(studentDTO.getLastName());
+		student.setGrade(studentDTO.getGrade());
+		student.setEmail(studentDTO.getEmail());
+		student.setPhoneNumber(studentDTO.getPhoneNumber());
+		
+		studentRepository.save(student);
+		
 	}
 
 	@Override
@@ -64,5 +83,33 @@ public class StudentServiceImpl implements StudentService {
 		Student student = findStudent(id);
 		studentRepository.delete(student);
 	}
+
+	@Override
+	public Page<Student> getAllWithPage(Pageable pageable) {
+
+		return studentRepository.findAll(pageable);
+	}
+
+	@Override
+	public List<Student> findStudents(Integer grade) {
+
+		return studentRepository.findByGrade(grade);
+	}
+
+	@Override
+	public List<Student> findAllEqualsGrade(Integer grade) {
+
+		return studentRepository.findAllEqualsGrade(grade);
+	}
+
+	@Override
+	public StudentDTO findStudentDTOById(Long id) {
+
+		return studentRepository.findStudentDTOById(id).
+				orElseThrow(()-> new ResourceNotFoundException("Resource not found with id : " + id));
+	}
+
+
+
 
 }
