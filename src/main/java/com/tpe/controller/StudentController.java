@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +43,7 @@ public class StudentController {
 	@Autowired
 	private StudentService studentService;
 	
-	
+
 	@GetMapping("/welcome")
 	public String welcome(HttpServletRequest request) {
 		
@@ -51,6 +52,7 @@ public class StudentController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<Map<String, String>> createStudent(@Valid @RequestBody Student student){
 		studentService.createStudent(student);
@@ -61,18 +63,21 @@ public class StudentController {
 		return new ResponseEntity<>(map, HttpStatus.CREATED);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<Student>> getAll(){
 		List<Student> students = studentService.getAll();
 		return ResponseEntity.ok(students);
 	}
 	
+	@PreAuthorize("hasRole('STUDENT')")
 	@GetMapping("/query")
 	public ResponseEntity<Student> getStudent(@RequestParam("id") Long id){
 		Student student =  studentService.findStudent(id);
 		return ResponseEntity.ok(student);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN') or hasRole('STUDENT')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Student> getStudentWithPath(@PathVariable("id") Long id){
 		Student student =  studentService.findStudent(id);
