@@ -1,17 +1,23 @@
 package com.tpe.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,7 +54,12 @@ public class Student {
 	@Column(length = 14)
 	private String phoneNumber;
 	
+	//@JsonFormat(shape = Shape.STRING, pattern = "MM/dd/yyyy HH:mm:ss", timezone = "Turkey")
 	private LocalDateTime createDate = LocalDateTime.now();
+	
+	@OneToMany(mappedBy = "student")
+	private List<Book> books = new ArrayList<>();
+	
 
 
 }
